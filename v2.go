@@ -2,17 +2,16 @@ package main
 
 import (
 	"crypto/sha256"
-	"encoding/hex"
-	"fmt"
-	"math/big"
-	"regexp"
 	"strings"
+
+	"github.com/eknkc/basex"
 )
 
 const defaultSpecials string = "!@#$%^&*"
 
 func passgenV2(opts opts) string {
 	charset := createCharset(opts)
+	encoding, _ := basex.NewEncoding(charset)
 	var out string
 
 	for i := 0; true; i++ {
@@ -26,14 +25,7 @@ func passgenV2(opts opts) string {
 
 		passphrasePart := strings.Repeat(opts.passphrase, i+1)
 		hash := sha256.Sum256([]byte(passphrasePart + opts.salt))
-
-		// convert hash array of bytes into bigint
-		num := new(big.Int)
-		num.SetString(hex.EncodeToString(hash[:]), 16)
-		// encode bigint in custom character set
-		encoded := encodeToCustomCharset(num, charset)
-
-		out = fmt.Sprintf("%s%s", out, encoded)
+		out += encoding.Encode(hash[:])
 	}
 
 	return out[0:opts.length]
@@ -60,51 +52,23 @@ func createCharset(opts opts) string {
 }
 
 func containsNecessaryCharacters(s string, opts opts) bool {
-	if !opts.noNumbers {
-		matches, _ := regexp.MatchString(".*[0-9].*", s)
-		if !matches {
-			return false
-		}
+	if !opts.noNumbers && !strings.ContainsAny(s, "0123456789") {
+		return false
 	}
 
-	if !opts.noUppers {
-		matches, _ := regexp.MatchString(".*[A-Z].*", s)
-		if !matches {
-			return false
-		}
+	if !opts.noUppers && !strings.ContainsAny(s, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
+		return false
 	}
 
 	if !opts.noSpecials {
-		customSpecials := defaultSpecials
+		specials := defaultSpecials
 		if opts.customSpecials != "" {
-			customSpecials = opts.customSpecials
+			specials = opts.customSpecials
 		}
-
-		escapeChars := []string{"-", "[", "]", "^"}
-		for _, e := range escapeChars {
-			customSpecials = strings.ReplaceAll(customSpecials, e, "\\"+e)
-		}
-
-		matches, _ := regexp.MatchString(".*["+customSpecials+"].*", s)
-		if !matches {
+		if !strings.ContainsAny(s, specials) {
 			return false
 		}
 	}
 
 	return true
-}
-
-func encodeToCustomCharset(v *big.Int, charset string) string {
-	charsetLength := big.NewInt(int64(len(charset)))
-	var ret string
-	for {
-		if v.Cmp(big.NewInt(0)) == 0 {
-			break
-		}
-		remainder := new(big.Int).Mod(v, charsetLength)
-		v = new(big.Int).Div(v, charsetLength)
-
-		ret = fmt.Sprintf("%c%s", charset[remainder.Uint64()], ret)
-	}
-	return ret
 }
