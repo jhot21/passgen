@@ -1,13 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
 
+	osc52 "github.com/aymanbagabas/go-osc52/v2"
 	"github.com/peterh/liner"
 	"github.com/teris-io/cli"
-	"golang.design/x/clipboard"
 )
 
 func main() {
@@ -76,9 +77,9 @@ func main() {
 			// Print or copy password
 			_, printPass := options["print"]
 			if printPass {
-				println(pass)
+				fmt.Println(pass)
 			} else {
-				clipboard.Write(clipboard.FmtText, []byte(pass))
+				osc52.New(pass).WriteTo(os.Stderr)
 			}
 			return 0
 		})

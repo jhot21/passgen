@@ -46,7 +46,20 @@ Options:
         --custom-specials   use a custom set of special characters
 ```
 
-By default the generated password is copied to the clipboard silently. Use `--print` to display it instead.
+By default the generated password is copied to the clipboard using the [OSC 52](https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands) terminal escape sequence. This works over SSH and regardless of display server (X11, Wayland), but requires a supported terminal emulator:
+
+- **Supported:** kitty, WezTerm, Ghostty, foot, Alacritty, Windows Terminal, iTerm2 (enable in Preferences → General → "Applications in terminal may access clipboard"), xterm (requires `-allow` flag or `XTerm.allowWindowOps: true`)
+- **tmux:** add `set -g set-clipboard on` to `~/.tmux.conf`
+- **Not supported:** macOS Terminal.app, GNOME Terminal, and other VTE-based terminals (Terminator, XFCE Terminal, MATE Terminal)
+
+*Note this list is not exhaustive or updated regularly, see https://can-i-use-terminal.github.io/features/osc52copy.html for a more up to date list*
+
+If your terminal is not supported, use `--print` and pipe the output instead:
+
+```sh
+passgen --print github | pbcopy    # macOS
+passgen --print github | xclip -selection clipboard  # Linux X11
+```
 
 **Examples:**
 
