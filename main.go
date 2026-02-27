@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -76,7 +77,7 @@ func main() {
 			// Print or copy password
 			_, printPass := options["print"]
 			if printPass {
-				println(pass)
+				fmt.Println(pass)
 			} else {
 				osc52.New(pass).WriteTo(os.Stderr)
 			}
