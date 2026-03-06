@@ -273,7 +273,7 @@ func TestPassgenV3_GoldenValue(t *testing.T) {
 	o.salt = "mysalt"
 	o.length = 40
 	got := passgenV3(o)
-	// Golden value — regenerate with: go run . --version 3 --salt=mysalt --print "correct horse battery staple"
+	// Golden value — regenerate with: go run . --salt=mysalt --print "correct horse battery staple"
 	// If this changes, the v3 algorithm has changed and existing passwords will differ.
 	want := "Ap4@Cq1#Fe9*Qv5#Wi8@Bk8*Pc0@Fw9@Nf1*Qs3&"
 	if got != want {
