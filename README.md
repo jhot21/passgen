@@ -36,7 +36,7 @@ Arguments:
     passphrase              input passphrase (prompted if omitted)
 
 Options:
-    -v, --version           algorithm version (default: 2)
+    -v, --version           algorithm version (default: 3)
     -s, --salt              salt, overrides $PASSGEN_SALT
     -l, --length            output length (default: 40, or $PASSGEN_LENGTH)
     -p, --print             print to terminal instead of copying to clipboard
@@ -82,9 +82,13 @@ passgen --length 16 github
 
 ## Algorithms
 
-### v2 (default)
+### v3 (default)
 
-`passphrase + salt` → SHA-256 → basex-encoded using the active character set. If the output is too short or missing a required character class, the process repeats with an extended passphrase and the results are concatenated. Always produces uppercase, lowercase, digits, and specials unless disabled.
+`passphrase + salt` → SHA-256 → 32-byte ChaCha20 key → unlimited deterministic byte stream → characters selected round-robin across enabled character classes using rejection sampling for uniform distribution. Guarantees proportional representation of each enabled class (uppercase, lowercase, digits, specials) with no modulo bias.
+
+### v2 (legacy)
+
+`passphrase + salt` → SHA-256 → basex-encoded using the active character set. If the output is too short or missing a required character class, the process repeats with an extended passphrase and the results are concatenated. Use `--version 2` to select it.
 
 ### v1 (legacy)
 
