@@ -109,8 +109,10 @@ func generatePassword(opts opts) string {
 	switch opts.version {
 	case 1:
 		return passgenV1(opts)
-	default:
+	case 2:
 		return passgenV2(opts)
+	default:
+		return passgenV3(opts)
 	}
 }
 

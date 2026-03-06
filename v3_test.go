@@ -266,3 +266,17 @@ func TestPassgenV3_DifferentInputsDifferentOutputs(t *testing.T) {
 		t.Error("different passphrases should produce different passwords")
 	}
 }
+
+func TestPassgenV3_GoldenValue(t *testing.T) {
+	o := defaultOpts()
+	o.passphrase = "correct horse battery staple"
+	o.salt = "mysalt"
+	o.length = 40
+	got := passgenV3(o)
+	// Golden value — regenerate with: go run . --version 3 --salt=mysalt --print "correct horse battery staple"
+	// If this changes, the v3 algorithm has changed and existing passwords will differ.
+	want := "Ap4@Cq1#Fe9*Qv5#Wi8@Bk8*Pc0@Fw9@Nf1*Qs3&"
+	if got != want {
+		t.Errorf("v3 golden value changed\ngot:  %q\nwant: %q", got, want)
+	}
+}
