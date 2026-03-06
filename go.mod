@@ -1,6 +1,6 @@
 module codeberg.org/jhot/passgen
 
-go 1.24
+go 1.24.0
 
 toolchain go1.24.3
 
@@ -16,5 +16,5 @@ require (
 require (
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
-	golang.org/x/sys v0.34.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
 )
