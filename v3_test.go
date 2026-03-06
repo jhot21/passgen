@@ -47,6 +47,11 @@ func TestBuildEnabledClasses_NoNumbers(t *testing.T) {
 	if len(classes) != 3 {
 		t.Fatalf("expected 3 classes, got %d", len(classes))
 	}
+	for _, c := range classes {
+		if c == "0123456789" {
+			t.Error("digits class should not be present when noNumbers=true")
+		}
+	}
 }
 
 func TestBuildEnabledClasses_NoSpecials(t *testing.T) {
@@ -56,6 +61,11 @@ func TestBuildEnabledClasses_NoSpecials(t *testing.T) {
 	classes := buildEnabledClasses(o)
 	if len(classes) != 3 {
 		t.Fatalf("expected 3 classes, got %d", len(classes))
+	}
+	for _, c := range classes {
+		if c == defaultSpecials {
+			t.Error("specials class should not be present when noSpecials=true")
+		}
 	}
 }
 
