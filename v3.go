@@ -7,8 +7,22 @@ import (
 )
 
 func passgenV3(opts opts) string {
-	// placeholder — implemented in Task 5
-	return ""
+	key := sha256.Sum256([]byte(opts.passphrase + opts.salt))
+	nonce := make([]byte, chacha20.NonceSize) // 12 zero bytes
+
+	stream, err := chacha20.NewUnauthenticatedCipher(key[:], nonce)
+	if err != nil {
+		// Cannot happen: key is always 32 bytes, nonce always 12 bytes
+		panic(err)
+	}
+
+	classes := buildEnabledClasses(opts)
+	result := make([]byte, opts.length)
+	for i := range result {
+		class := classes[i%len(classes)]
+		result[i] = sampleFromClass(stream, class)
+	}
+	return string(result)
 }
 
 func buildEnabledClasses(opts opts) []string {
@@ -30,10 +44,20 @@ func buildEnabledClasses(opts opts) []string {
 	return classes
 }
 
+// sampleFromClass reads bytes from stream using rejection sampling to return
+// a uniformly distributed index into class, avoiding modulo bias.
 func sampleFromClass(stream *chacha20.Cipher, class string) byte {
-	// placeholder — implemented in Task 5
-	return 0
+	size := len(class)
+	// largest multiple of size that fits in a byte (0-255)
+	limit := (256 / size) * size
+	buf := make([]byte, 1)
+	zeros := make([]byte, 1)
+	for {
+		stream.XORKeyStream(buf, zeros)
+		b := int(buf[0])
+		if b < limit {
+			return class[b%size]
+		}
+		// byte is in the bias zone — discard and try again
+	}
 }
-
-// suppress unused import errors until Task 5
-var _ = sha256.Sum256
