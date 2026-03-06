@@ -102,6 +102,9 @@ func TestPassgenV3_Deterministic(t *testing.T) {
 	o.passphrase = "correct horse battery staple"
 	o.salt = "mysalt"
 	p1 := passgenV3(o)
+	if len(p1) == 0 {
+		t.Fatal("passgenV3 returned empty string")
+	}
 	p2 := passgenV3(o)
 	if p1 != p2 {
 		t.Errorf("passgenV3 is not deterministic: %q != %q", p1, p2)
@@ -171,6 +174,9 @@ func TestPassgenV3_NoUppers(t *testing.T) {
 	o.length = 40
 	o.noUppers = true
 	p := passgenV3(o)
+	if len(p) == 0 {
+		t.Fatal("passgenV3 returned empty string")
+	}
 	for _, c := range p {
 		if c >= 'A' && c <= 'Z' {
 			t.Errorf("password contains uppercase %q but noUppers=true", c)
@@ -185,6 +191,9 @@ func TestPassgenV3_NoNumbers(t *testing.T) {
 	o.length = 40
 	o.noNumbers = true
 	p := passgenV3(o)
+	if len(p) == 0 {
+		t.Fatal("passgenV3 returned empty string")
+	}
 	for _, c := range p {
 		if c >= '0' && c <= '9' {
 			t.Errorf("password contains digit %q but noNumbers=true", c)
@@ -199,6 +208,9 @@ func TestPassgenV3_NoSpecials(t *testing.T) {
 	o.length = 40
 	o.noSpecials = true
 	p := passgenV3(o)
+	if len(p) == 0 {
+		t.Fatal("passgenV3 returned empty string")
+	}
 	for _, c := range p {
 		if !((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) {
 			t.Errorf("password contains special %q but noSpecials=true", c)
