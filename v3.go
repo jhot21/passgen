@@ -60,19 +60,7 @@ func sampleIndex(stream *chacha20.Cipher, n int) int {
 }
 
 // sampleFromClass reads bytes from stream using rejection sampling to return
-// a uniformly distributed index into class, avoiding modulo bias.
+// a uniformly distributed character from class, avoiding modulo bias.
 func sampleFromClass(stream *chacha20.Cipher, class string) byte {
-	size := len(class)
-	// largest multiple of size that fits in a byte (0-255)
-	limit := (256 / size) * size
-	buf := make([]byte, 1)
-	zeros := make([]byte, 1)
-	for {
-		stream.XORKeyStream(buf, zeros)
-		b := int(buf[0])
-		if b < limit {
-			return class[b%size]
-		}
-		// byte is in the bias zone — discard and try again
-	}
+	return class[sampleIndex(stream, len(class))]
 }
