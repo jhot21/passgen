@@ -1,7 +1,10 @@
 package main
 
 import (
+	"crypto/sha256"
 	"testing"
+
+	"golang.org/x/crypto/chacha20"
 )
 
 func TestBuildEnabledClasses_Default(t *testing.T) {
@@ -278,5 +281,39 @@ func TestPassgenV3_GoldenValue(t *testing.T) {
 	want := "Ap4@Cq1#Fe9*Qv5#Wi8@Bk8*Pc0@Fw9@Nf1*Qs3&"
 	if got != want {
 		t.Errorf("v3 golden value changed\ngot:  %q\nwant: %q", got, want)
+	}
+}
+
+func TestSampleIndex_InRange(t *testing.T) {
+	key := sha256.Sum256([]byte("test"))
+	nonce := make([]byte, chacha20.NonceSize)
+	stream, _ := chacha20.NewUnauthenticatedCipher(key[:], nonce)
+	for i := 0; i < 1000; i++ {
+		idx := sampleIndex(stream, 4)
+		if idx < 0 || idx >= 4 {
+			t.Fatalf("sampleIndex(%d) = %d, want [0,4)", i, idx)
+		}
+	}
+}
+
+func TestSampleIndex_UniformDistribution(t *testing.T) {
+	key := sha256.Sum256([]byte("test"))
+	nonce := make([]byte, chacha20.NonceSize)
+	stream, _ := chacha20.NewUnauthenticatedCipher(key[:], nonce)
+	counts := make([]int, 4)
+	const trials = 4000
+	for i := 0; i < trials; i++ {
+		counts[sampleIndex(stream, 4)]++
+	}
+	expected := trials / 4
+	tolerance := expected / 5
+	for i, c := range counts {
+		diff := c - expected
+		if diff < 0 {
+			diff = -diff
+		}
+		if diff > tolerance {
+			t.Errorf("index %d: count %d outside tolerance (expected ~%d ±%d)", i, c, expected, tolerance)
+		}
 	}
 }

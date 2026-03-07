@@ -44,6 +44,21 @@ func buildEnabledClasses(opts opts) []string {
 	return classes
 }
 
+// sampleIndex returns a uniformly distributed integer in [0, n) using
+// rejection sampling from stream, avoiding modulo bias.
+func sampleIndex(stream *chacha20.Cipher, n int) int {
+	limit := (256 / n) * n
+	buf := make([]byte, 1)
+	zeros := make([]byte, 1)
+	for {
+		stream.XORKeyStream(buf, zeros)
+		b := int(buf[0])
+		if b < limit {
+			return b % n
+		}
+	}
+}
+
 // sampleFromClass reads bytes from stream using rejection sampling to return
 // a uniformly distributed index into class, avoiding modulo bias.
 func sampleFromClass(stream *chacha20.Cipher, class string) byte {
