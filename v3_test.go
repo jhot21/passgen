@@ -387,3 +387,40 @@ func TestShuffleClasses_Deterministic(t *testing.T) {
 		}
 	}
 }
+
+func TestPassgenV3_CycleOrderVaries(t *testing.T) {
+	o := defaultOpts()
+	o.passphrase = "correct horse battery staple"
+	o.salt = "mysalt"
+	o.length = 8 // two full cycles of 4 classes
+
+	p := passgenV3(o)
+
+	classOf := func(c rune) string {
+		switch {
+		case c >= 'A' && c <= 'Z':
+			return "U"
+		case c >= 'a' && c <= 'z':
+			return "L"
+		case c >= '0' && c <= '9':
+			return "D"
+		default:
+			return "S"
+		}
+	}
+
+	cycle1 := make([]string, 4)
+	cycle2 := make([]string, 4)
+	runes := []rune(p)
+	for i := 0; i < 4; i++ {
+		cycle1[i] = classOf(runes[i])
+		cycle2[i] = classOf(runes[i+4])
+	}
+
+	for i := range cycle1 {
+		if cycle1[i] != cycle2[i] {
+			return // cycles differ — test passes
+		}
+	}
+	t.Errorf("cycle1 and cycle2 have identical class order %v; expected variation", cycle1)
+}
