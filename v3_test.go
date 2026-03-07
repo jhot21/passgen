@@ -317,3 +317,30 @@ func TestSampleIndex_UniformDistribution(t *testing.T) {
 		}
 	}
 }
+
+func TestShuffleClasses_IsPermutation(t *testing.T) {
+	key := sha256.Sum256([]byte("test"))
+	nonce := make([]byte, chacha20.NonceSize)
+	stream, _ := chacha20.NewUnauthenticatedCipher(key[:], nonce)
+
+	original := []string{
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+		"abcdefghijklmnopqrstuvwxyz",
+		"0123456789",
+		defaultSpecials,
+	}
+	classes := make([]string, len(original))
+	copy(classes, original)
+
+	shuffleClasses(stream, classes)
+
+	found := make(map[string]bool)
+	for _, c := range classes {
+		found[c] = true
+	}
+	for _, c := range original {
+		if !found[c] {
+			t.Errorf("element %q missing after shuffle", c)
+		}
+	}
+}

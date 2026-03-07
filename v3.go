@@ -59,6 +59,15 @@ func sampleIndex(stream *chacha20.Cipher, n int) int {
 	}
 }
 
+// shuffleClasses performs a Fisher-Yates shuffle of classes in place,
+// drawing swap indices from stream.
+func shuffleClasses(stream *chacha20.Cipher, classes []string) {
+	for i := len(classes) - 1; i > 0; i-- {
+		j := sampleIndex(stream, i+1)
+		classes[i], classes[j] = classes[j], classes[i]
+	}
+}
+
 // sampleFromClass reads bytes from stream using rejection sampling to return
 // a uniformly distributed character from class, avoiding modulo bias.
 func sampleFromClass(stream *chacha20.Cipher, class string) byte {
