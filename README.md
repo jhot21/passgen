@@ -84,7 +84,7 @@ passgen --length 16 github
 
 ### v3 (default)
 
-`passphrase + salt` → SHA-256 → 32-byte ChaCha20 key → unlimited deterministic byte stream → characters selected round-robin across enabled character classes using rejection sampling for uniform distribution. Guarantees proportional representation of each enabled class (uppercase, lowercase, digits, specials) with no modulo bias.
+`passphrase + salt` → SHA-256 → 32-byte ChaCha20 key → unlimited deterministic byte stream → output generated in cycles of N characters (where N = number of enabled classes). At the start of each cycle, the class order is shuffled via Fisher-Yates using bytes from the ChaCha20 stream, then one character is sampled from each class using rejection sampling for uniform distribution. Guarantees each enabled class (uppercase, lowercase, digits, specials) appears exactly once per cycle with no modulo bias and no predictable positional pattern.
 
 ### v2 (legacy)
 
