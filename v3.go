@@ -17,10 +17,17 @@ func passgenV3(opts opts) string {
 	}
 
 	classes := buildEnabledClasses(opts)
+	n := len(classes)
 	result := make([]byte, opts.length)
-	for i := range result {
-		class := classes[i%len(classes)]
-		result[i] = sampleFromClass(stream, class)
+	cycle := make([]string, n)
+
+	for i := 0; i < opts.length; {
+		copy(cycle, classes)
+		shuffleClasses(stream, cycle)
+		for j := 0; j < n && i < opts.length; j++ {
+			result[i] = sampleFromClass(stream, cycle[j])
+			i++
+		}
 	}
 	return string(result)
 }
