@@ -343,4 +343,47 @@ func TestShuffleClasses_IsPermutation(t *testing.T) {
 			t.Errorf("element %q missing after shuffle", c)
 		}
 	}
+
+	// Verify the shuffle actually changed the order (with this fixed seed it must)
+	allSame := true
+	for i := range classes {
+		if classes[i] != original[i] {
+			allSame = false
+			break
+		}
+	}
+	if allSame {
+		t.Error("shuffleClasses did not change the order of elements")
+	}
+}
+
+func TestShuffleClasses_Deterministic(t *testing.T) {
+	// Two identical streams must produce identical shuffle orders.
+	newStream := func() *chacha20.Cipher {
+		key := sha256.Sum256([]byte("test"))
+		nonce := make([]byte, chacha20.NonceSize)
+		s, _ := chacha20.NewUnauthenticatedCipher(key[:], nonce)
+		return s
+	}
+
+	input := []string{
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+		"abcdefghijklmnopqrstuvwxyz",
+		"0123456789",
+		defaultSpecials,
+	}
+
+	a := make([]string, len(input))
+	b := make([]string, len(input))
+	copy(a, input)
+	copy(b, input)
+
+	shuffleClasses(newStream(), a)
+	shuffleClasses(newStream(), b)
+
+	for i := range a {
+		if a[i] != b[i] {
+			t.Errorf("position %d: got %q and %q; same seed must produce same order", i, a[i], b[i])
+		}
+	}
 }
