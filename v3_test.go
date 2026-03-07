@@ -392,9 +392,13 @@ func TestPassgenV3_CycleOrderVaries(t *testing.T) {
 	o := defaultOpts()
 	o.passphrase = "correct horse battery staple"
 	o.salt = "mysalt"
-	o.length = 8 // two full cycles of 4 classes
+	n := len(buildEnabledClasses(o))
+	o.length = 2 * n // exactly two full cycles
 
 	p := passgenV3(o)
+	if len(p) < 2*n {
+		t.Fatalf("expected password length >= %d, got %d", 2*n, len(p))
+	}
 
 	classOf := func(c rune) string {
 		switch {
@@ -409,13 +413,16 @@ func TestPassgenV3_CycleOrderVaries(t *testing.T) {
 		}
 	}
 
-	cycle1 := make([]string, 4)
-	cycle2 := make([]string, 4)
 	runes := []rune(p)
-	for i := 0; i < 4; i++ {
+	cycle1 := make([]string, n)
+	cycle2 := make([]string, n)
+	for i := range n {
 		cycle1[i] = classOf(runes[i])
-		cycle2[i] = classOf(runes[i+4])
+		cycle2[i] = classOf(runes[i+n])
 	}
+
+	t.Logf("cycle1: %v", cycle1)
+	t.Logf("cycle2: %v", cycle2)
 
 	for i := range cycle1 {
 		if cycle1[i] != cycle2[i] {
