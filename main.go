@@ -23,6 +23,8 @@ func main() {
 		WithOption(cli.NewOption("no-uppers", "no uppercase characters").WithType(cli.TypeBool)).
 		WithOption(cli.NewOption("no-numbers", "no number characters").WithType(cli.TypeBool)).
 		WithOption(cli.NewOption("custom-specials", "custom special character set").WithType(cli.TypeString)).
+		WithOption(cli.NewOption("no-ambiguous", "exclude ambiguous characters (Il1O05S)").WithType(cli.TypeBool)).
+		WithOption(cli.NewOption("custom-ambiguous", "custom set of ambiguous characters to exclude").WithType(cli.TypeString)).
 		WithAction(func(args []string, options map[string]string) int {
 			// Parse options
 			opts := defaultOpts()
@@ -61,6 +63,13 @@ func main() {
 			_, opts.noSpecials = options["no-specials"]
 			_, opts.noUppers = options["no-uppers"]
 			_, opts.noNumbers = options["no-numbers"]
+			_, opts.noAmbiguous = options["no-ambiguous"]
+
+			customAmbiguousValue, customAmbiguousExists := options["custom-ambiguous"]
+			if customAmbiguousExists {
+				opts.customAmbiguous = customAmbiguousValue
+				opts.noAmbiguous = true
+			}
 
 			if len(args) > 0 { // passphrase supplied as an argument
 				opts.passphrase = strings.Join(args, " ")
@@ -88,14 +97,16 @@ func main() {
 }
 
 type opts struct {
-	version        int
-	passphrase     string
-	salt           string
-	length         int
-	noUppers       bool
-	noNumbers      bool
-	noSpecials     bool
-	customSpecials string
+	version         int
+	passphrase      string
+	salt            string
+	length          int
+	noUppers        bool
+	noNumbers       bool
+	noSpecials      bool
+	customSpecials  string
+	noAmbiguous     bool
+	customAmbiguous string
 }
 
 func defaultOpts() opts {
@@ -109,8 +120,10 @@ func generatePassword(opts opts) string {
 	switch opts.version {
 	case 1:
 		return passgenV1(opts)
-	default:
+	case 2:
 		return passgenV2(opts)
+	default:
+		return passgenV3(opts)
 	}
 }
 

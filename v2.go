@@ -8,6 +8,8 @@ import (
 )
 
 const defaultSpecials string = "!@#$%^&*"
+// I (upper I), l (lower L), 1 (one), O (upper O), 0 (zero), 5, S
+const defaultAmbiguous string = "Il1O05S"
 
 func passgenV2(opts opts) string {
 	charset := createCharset(opts)
@@ -48,7 +50,26 @@ func createCharset(opts opts) string {
 		}
 	}
 
+	if opts.noAmbiguous {
+		ambiguous := defaultAmbiguous
+		if opts.customAmbiguous != "" {
+			ambiguous = opts.customAmbiguous
+		}
+		charset = filterAmbiguous(charset, ambiguous)
+	}
+
 	return charset
+}
+
+// filterAmbiguous returns class with any characters present in ambiguous removed.
+func filterAmbiguous(class, ambiguous string) string {
+	result := make([]byte, 0, len(class))
+	for i := 0; i < len(class); i++ {
+		if !strings.ContainsRune(ambiguous, rune(class[i])) {
+			result = append(result, class[i])
+		}
+	}
+	return string(result)
 }
 
 func containsNecessaryCharacters(s string, opts opts) bool {

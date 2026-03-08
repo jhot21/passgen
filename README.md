@@ -36,7 +36,7 @@ Arguments:
     passphrase              input passphrase (prompted if omitted)
 
 Options:
-    -v, --version           algorithm version (default: 2)
+    -v, --version           algorithm version (default: 3)
     -s, --salt              salt, overrides $PASSGEN_SALT
     -l, --length            output length (default: 40, or $PASSGEN_LENGTH)
     -p, --print             print to terminal instead of copying to clipboard
@@ -44,6 +44,8 @@ Options:
         --no-numbers        exclude digits
         --no-specials       exclude special characters
         --custom-specials   use a custom set of special characters
+        --no-ambiguous      exclude visually ambiguous characters (Il1O05S)
+        --custom-ambiguous  use a custom set of ambiguous characters to exclude
 ```
 
 By default the generated password is copied to the clipboard using the [OSC 52](https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands) terminal escape sequence. This works over SSH and regardless of display server (X11, Wayland), but requires a supported terminal emulator:
@@ -82,9 +84,13 @@ passgen --length 16 github
 
 ## Algorithms
 
-### v2 (default)
+### v3 (default)
 
-`passphrase + salt` → SHA-256 → basex-encoded using the active character set. If the output is too short or missing a required character class, the process repeats with an extended passphrase and the results are concatenated. Always produces uppercase, lowercase, digits, and specials unless disabled.
+`passphrase + salt` → SHA-256 → 32-byte ChaCha20 key → unlimited deterministic byte stream → output generated in cycles of N characters (where N = number of enabled classes). At the start of each cycle, the class order is shuffled via Fisher-Yates using bytes from the ChaCha20 stream, then one character is sampled from each class using rejection sampling for uniform distribution. Guarantees each enabled class (uppercase, lowercase, digits, specials) appears exactly once per cycle with no modulo bias and no predictable positional pattern.
+
+### v2 (legacy)
+
+`passphrase + salt` → SHA-256 → basex-encoded using the active character set. If the output is too short or missing a required character class, the process repeats with an extended passphrase and the results are concatenated. Use `--version 2` to select it.
 
 ### v1 (legacy)
 

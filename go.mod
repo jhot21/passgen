@@ -1,6 +1,6 @@
 module codeberg.org/jhot/passgen
 
-go 1.24
+go 1.24.0
 
 toolchain go1.24.3
 
@@ -11,10 +11,11 @@ require (
 	github.com/eknkc/basex v1.0.1
 	github.com/peterh/liner v1.2.2
 	github.com/teris-io/cli v1.0.1
+	golang.org/x/crypto v0.48.0
 )
 
 require (
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
-	golang.org/x/sys v0.34.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
 )

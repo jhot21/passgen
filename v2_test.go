@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -136,5 +137,69 @@ func TestContainsNecessaryCharacters(t *testing.T) {
 				t.Errorf("containsNecessaryCharacters(%q) = %v, want %v", tt.s, got, tt.want)
 			}
 		})
+	}
+}
+
+func TestFilterAmbiguous_RemovesChars(t *testing.T) {
+	got := filterAmbiguous("ABCDEFGHIJKLMNOPQRSTUVWXYZ", defaultAmbiguous)
+	for _, c := range got {
+		if strings.ContainsRune(defaultAmbiguous, c) {
+			t.Errorf("filterAmbiguous left ambiguous char %q in result %q", c, got)
+		}
+	}
+	if strings.Contains(got, "O") {
+		t.Errorf("expected O removed, got %q", got)
+	}
+	if !strings.Contains(got, "A") {
+		t.Errorf("expected A present, got %q", got)
+	}
+}
+
+func TestFilterAmbiguous_EmptyResult(t *testing.T) {
+	got := filterAmbiguous("Il1", defaultAmbiguous)
+	if got != "" {
+		t.Errorf("expected empty string, got %q", got)
+	}
+}
+
+func TestFilterAmbiguous_LowercaseAlphabet(t *testing.T) {
+	got := filterAmbiguous("abcdefghijklmnopqrstuvwxyz", defaultAmbiguous)
+	// defaultAmbiguous contains lowercase l — it should be removed
+	if strings.Contains(got, "l") {
+		t.Errorf("expected l removed, got %q", got)
+	}
+	if !strings.Contains(got, "a") {
+		t.Errorf("expected a present, got %q", got)
+	}
+}
+
+func TestCreateCharset_NoAmbiguous(t *testing.T) {
+	o := defaultOpts()
+	o.passphrase = "test"
+	o.noAmbiguous = true
+	charset := createCharset(o)
+	for _, c := range charset {
+		if strings.ContainsRune(defaultAmbiguous, c) {
+			t.Errorf("charset contains ambiguous char %q: %q", c, charset)
+		}
+	}
+}
+
+func TestCreateCharset_CustomAmbiguous(t *testing.T) {
+	o := defaultOpts()
+	o.passphrase = "test"
+	o.noAmbiguous = true
+	o.customAmbiguous = "abc"
+	charset := createCharset(o)
+	// Custom set replaces default: abc should be absent
+	for _, c := range charset {
+		if strings.ContainsRune("abc", c) {
+			t.Errorf("charset contains custom ambiguous char %q: %q", c, charset)
+		}
+	}
+	// defaultAmbiguous chars should still be present (not filtered)
+	// 'l' is in defaultAmbiguous but not in customAmbiguous="abc"
+	if !strings.ContainsRune(charset, 'l') {
+		t.Errorf("expected 'l' (defaultAmbiguous char) to be present when using customAmbiguous, got %q", charset)
 	}
 }
