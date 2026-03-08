@@ -8,6 +8,7 @@ import (
 )
 
 const defaultSpecials string = "!@#$%^&*"
+// I (upper I), l (lower L), 1 (one), O (upper O), 0 (zero), 5, S
 const defaultAmbiguous string = "Il1O05S"
 
 func passgenV2(opts opts) string {

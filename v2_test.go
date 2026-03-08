@@ -141,9 +141,9 @@ func TestContainsNecessaryCharacters(t *testing.T) {
 }
 
 func TestFilterAmbiguous_RemovesChars(t *testing.T) {
-	got := filterAmbiguous("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "Il1O05S")
+	got := filterAmbiguous("ABCDEFGHIJKLMNOPQRSTUVWXYZ", defaultAmbiguous)
 	for _, c := range got {
-		if strings.ContainsRune("Il1O05S", c) {
+		if strings.ContainsRune(defaultAmbiguous, c) {
 			t.Errorf("filterAmbiguous left ambiguous char %q in result %q", c, got)
 		}
 	}
@@ -156,14 +156,14 @@ func TestFilterAmbiguous_RemovesChars(t *testing.T) {
 }
 
 func TestFilterAmbiguous_EmptyResult(t *testing.T) {
-	got := filterAmbiguous("Il1", "Il1O05S")
+	got := filterAmbiguous("Il1", defaultAmbiguous)
 	if got != "" {
 		t.Errorf("expected empty string, got %q", got)
 	}
 }
 
-func TestFilterAmbiguous_NoOverlap(t *testing.T) {
-	got := filterAmbiguous("abcdefghijklmnopqrstuvwxyz", "Il1O05S")
+func TestFilterAmbiguous_LowercaseAlphabet(t *testing.T) {
+	got := filterAmbiguous("abcdefghijklmnopqrstuvwxyz", defaultAmbiguous)
 	// defaultAmbiguous contains lowercase l — it should be removed
 	if strings.Contains(got, "l") {
 		t.Errorf("expected l removed, got %q", got)
