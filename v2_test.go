@@ -172,3 +172,15 @@ func TestFilterAmbiguous_LowercaseAlphabet(t *testing.T) {
 		t.Errorf("expected a present, got %q", got)
 	}
 }
+
+func TestCreateCharset_NoAmbiguous(t *testing.T) {
+	o := defaultOpts()
+	o.passphrase = "test"
+	o.noAmbiguous = true
+	charset := createCharset(o)
+	for _, c := range charset {
+		if strings.ContainsRune(defaultAmbiguous, c) {
+			t.Errorf("charset contains ambiguous char %q: %q", c, charset)
+		}
+	}
+}

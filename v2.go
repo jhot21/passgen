@@ -50,6 +50,14 @@ func createCharset(opts opts) string {
 		}
 	}
 
+	if opts.noAmbiguous {
+		ambiguous := defaultAmbiguous
+		if opts.customAmbiguous != "" {
+			ambiguous = opts.customAmbiguous
+		}
+		charset = filterAmbiguous(charset, ambiguous)
+	}
+
 	return charset
 }
 
