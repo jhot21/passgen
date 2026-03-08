@@ -17,6 +17,9 @@ func passgenV3(opts opts) string {
 	}
 
 	classes := buildEnabledClasses(opts)
+	if len(classes) == 0 {
+		panic("passgen: all character classes are empty after filtering")
+	}
 	n := len(classes)
 	result := make([]byte, opts.length)
 	cycle := make([]string, n)

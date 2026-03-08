@@ -394,6 +394,9 @@ func TestBuildEnabledClasses_NoAmbiguous(t *testing.T) {
 	o.passphrase = "test"
 	o.noAmbiguous = true
 	classes := buildEnabledClasses(o)
+	if len(classes) != 4 {
+		t.Fatalf("expected 4 classes, got %d: %v", len(classes), classes)
+	}
 	for _, class := range classes {
 		for _, c := range class {
 			if strings.ContainsRune(defaultAmbiguous, c) {
@@ -409,10 +412,17 @@ func TestBuildEnabledClasses_CustomAmbiguous(t *testing.T) {
 	o.noAmbiguous = true
 	o.customAmbiguous = "ABC"
 	classes := buildEnabledClasses(o)
+	if len(classes) != 4 {
+		t.Fatalf("expected 4 classes, got %d: %v", len(classes), classes)
+	}
 	for _, class := range classes {
 		if strings.ContainsAny(class, "ABC") {
 			t.Errorf("class %q contains custom ambiguous chars", class)
 		}
+	}
+	// Lowercase class should be completely intact (no overlap with "ABC")
+	if classes[1] != "abcdefghijklmnopqrstuvwxyz" {
+		t.Errorf("expected lowercase class unchanged, got %q", classes[1])
 	}
 }
 
@@ -420,7 +430,7 @@ func TestPassgenV3_NoAmbiguous(t *testing.T) {
 	o := defaultOpts()
 	o.passphrase = "correct horse battery staple"
 	o.salt = "mysalt"
-	o.length = 40
+	o.length = 200
 	o.noAmbiguous = true
 	p := passgenV3(o)
 	if len(p) == 0 {
