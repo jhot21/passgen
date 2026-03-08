@@ -184,3 +184,22 @@ func TestCreateCharset_NoAmbiguous(t *testing.T) {
 		}
 	}
 }
+
+func TestCreateCharset_CustomAmbiguous(t *testing.T) {
+	o := defaultOpts()
+	o.passphrase = "test"
+	o.noAmbiguous = true
+	o.customAmbiguous = "abc"
+	charset := createCharset(o)
+	// Custom set replaces default: abc should be absent
+	for _, c := range charset {
+		if strings.ContainsRune("abc", c) {
+			t.Errorf("charset contains custom ambiguous char %q: %q", c, charset)
+		}
+	}
+	// defaultAmbiguous chars should still be present (not filtered)
+	// 'l' is in defaultAmbiguous but not in customAmbiguous="abc"
+	if !strings.ContainsRune(charset, 'l') {
+		t.Errorf("expected 'l' (defaultAmbiguous char) to be present when using customAmbiguous, got %q", charset)
+	}
+}
