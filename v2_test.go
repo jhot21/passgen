@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -136,5 +137,38 @@ func TestContainsNecessaryCharacters(t *testing.T) {
 				t.Errorf("containsNecessaryCharacters(%q) = %v, want %v", tt.s, got, tt.want)
 			}
 		})
+	}
+}
+
+func TestFilterAmbiguous_RemovesChars(t *testing.T) {
+	got := filterAmbiguous("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "Il1O05S")
+	for _, c := range got {
+		if strings.ContainsRune("Il1O05S", c) {
+			t.Errorf("filterAmbiguous left ambiguous char %q in result %q", c, got)
+		}
+	}
+	if strings.Contains(got, "O") {
+		t.Errorf("expected O removed, got %q", got)
+	}
+	if !strings.Contains(got, "A") {
+		t.Errorf("expected A present, got %q", got)
+	}
+}
+
+func TestFilterAmbiguous_EmptyResult(t *testing.T) {
+	got := filterAmbiguous("Il1", "Il1O05S")
+	if got != "" {
+		t.Errorf("expected empty string, got %q", got)
+	}
+}
+
+func TestFilterAmbiguous_NoOverlap(t *testing.T) {
+	got := filterAmbiguous("abcdefghijklmnopqrstuvwxyz", "Il1O05S")
+	// defaultAmbiguous contains lowercase l — it should be removed
+	if strings.Contains(got, "l") {
+		t.Errorf("expected l removed, got %q", got)
+	}
+	if !strings.Contains(got, "a") {
+		t.Errorf("expected a present, got %q", got)
 	}
 }
