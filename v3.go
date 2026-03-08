@@ -34,19 +34,42 @@ func passgenV3(opts opts) string {
 
 func buildEnabledClasses(opts opts) []string {
 	var classes []string
-	if !opts.noUppers {
-		classes = append(classes, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	ambiguous := ""
+	if opts.noAmbiguous {
+		ambiguous = defaultAmbiguous
+		if opts.customAmbiguous != "" {
+			ambiguous = opts.customAmbiguous
+		}
 	}
-	classes = append(classes, "abcdefghijklmnopqrstuvwxyz")
+
+	maybeFilter := func(class string) string {
+		if ambiguous == "" {
+			return class
+		}
+		return filterAmbiguous(class, ambiguous)
+	}
+
+	if !opts.noUppers {
+		if c := maybeFilter("ABCDEFGHIJKLMNOPQRSTUVWXYZ"); c != "" {
+			classes = append(classes, c)
+		}
+	}
+	if c := maybeFilter("abcdefghijklmnopqrstuvwxyz"); c != "" {
+		classes = append(classes, c)
+	}
 	if !opts.noNumbers {
-		classes = append(classes, "0123456789")
+		if c := maybeFilter("0123456789"); c != "" {
+			classes = append(classes, c)
+		}
 	}
 	if !opts.noSpecials {
 		specials := defaultSpecials
 		if opts.customSpecials != "" {
 			specials = opts.customSpecials
 		}
-		classes = append(classes, specials)
+		if c := maybeFilter(specials); c != "" {
+			classes = append(classes, c)
+		}
 	}
 	return classes
 }

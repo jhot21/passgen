@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/sha256"
+	"strings"
 	"testing"
 
 	"golang.org/x/crypto/chacha20"
@@ -384,6 +385,50 @@ func TestShuffleClasses_Deterministic(t *testing.T) {
 	for i := range a {
 		if a[i] != b[i] {
 			t.Errorf("position %d: got %q and %q; same seed must produce same order", i, a[i], b[i])
+		}
+	}
+}
+
+func TestBuildEnabledClasses_NoAmbiguous(t *testing.T) {
+	o := defaultOpts()
+	o.passphrase = "test"
+	o.noAmbiguous = true
+	classes := buildEnabledClasses(o)
+	for _, class := range classes {
+		for _, c := range class {
+			if strings.ContainsRune(defaultAmbiguous, c) {
+				t.Errorf("class %q contains ambiguous char %q", class, c)
+			}
+		}
+	}
+}
+
+func TestBuildEnabledClasses_CustomAmbiguous(t *testing.T) {
+	o := defaultOpts()
+	o.passphrase = "test"
+	o.noAmbiguous = true
+	o.customAmbiguous = "ABC"
+	classes := buildEnabledClasses(o)
+	for _, class := range classes {
+		if strings.ContainsAny(class, "ABC") {
+			t.Errorf("class %q contains custom ambiguous chars", class)
+		}
+	}
+}
+
+func TestPassgenV3_NoAmbiguous(t *testing.T) {
+	o := defaultOpts()
+	o.passphrase = "correct horse battery staple"
+	o.salt = "mysalt"
+	o.length = 40
+	o.noAmbiguous = true
+	p := passgenV3(o)
+	if len(p) == 0 {
+		t.Fatal("passgenV3 returned empty string")
+	}
+	for _, c := range p {
+		if strings.ContainsRune(defaultAmbiguous, c) {
+			t.Errorf("password contains ambiguous char %q: %q", c, p)
 		}
 	}
 }
