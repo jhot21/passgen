@@ -44,6 +44,8 @@ Options:
         --no-numbers        exclude digits
         --no-specials       exclude special characters
         --custom-specials   use a custom set of special characters
+        --no-ambiguous      exclude visually ambiguous characters (Il1O05S)
+        --custom-ambiguous  use a custom set of ambiguous characters to exclude
 ```
 
 By default the generated password is copied to the clipboard using the [OSC 52](https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands) terminal escape sequence. This works over SSH and regardless of display server (X11, Wayland), but requires a supported terminal emulator:
