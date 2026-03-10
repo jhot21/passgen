@@ -1,4 +1,4 @@
-package main
+package passgen
 
 import (
 	"crypto/sha256"

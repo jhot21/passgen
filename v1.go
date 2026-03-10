@@ -1,4 +1,4 @@
-package main
+package passgen
 
 import (
 	"encoding/binary"

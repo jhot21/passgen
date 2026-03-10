@@ -1,4 +1,4 @@
-package main
+package passgen
 
 import (
 	"crypto/sha256"
@@ -9,7 +9,7 @@ import (
 )
 
 func TestBuildEnabledClasses_Default(t *testing.T) {
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "test"
 	classes := buildEnabledClasses(o)
 	if len(classes) != 4 {
@@ -31,7 +31,7 @@ func TestBuildEnabledClasses_Default(t *testing.T) {
 }
 
 func TestBuildEnabledClasses_NoUppers(t *testing.T) {
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "test"
 	o.noUppers = true
 	classes := buildEnabledClasses(o)
@@ -44,7 +44,7 @@ func TestBuildEnabledClasses_NoUppers(t *testing.T) {
 }
 
 func TestBuildEnabledClasses_NoNumbers(t *testing.T) {
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "test"
 	o.noNumbers = true
 	classes := buildEnabledClasses(o)
@@ -59,7 +59,7 @@ func TestBuildEnabledClasses_NoNumbers(t *testing.T) {
 }
 
 func TestBuildEnabledClasses_NoSpecials(t *testing.T) {
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "test"
 	o.noSpecials = true
 	classes := buildEnabledClasses(o)
@@ -74,7 +74,7 @@ func TestBuildEnabledClasses_NoSpecials(t *testing.T) {
 }
 
 func TestBuildEnabledClasses_OnlyLowercase(t *testing.T) {
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "test"
 	o.noUppers = true
 	o.noNumbers = true
@@ -89,7 +89,7 @@ func TestBuildEnabledClasses_OnlyLowercase(t *testing.T) {
 }
 
 func TestBuildEnabledClasses_CustomSpecials(t *testing.T) {
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "test"
 	o.customSpecials = "+-="
 	classes := buildEnabledClasses(o)
@@ -102,7 +102,7 @@ func TestBuildEnabledClasses_CustomSpecials(t *testing.T) {
 }
 
 func TestPassgenV3_Deterministic(t *testing.T) {
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "correct horse battery staple"
 	o.salt = "mysalt"
 	p1 := passgenV3(o)
@@ -116,7 +116,7 @@ func TestPassgenV3_Deterministic(t *testing.T) {
 }
 
 func TestPassgenV3_Length(t *testing.T) {
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "correct horse battery staple"
 	o.salt = "mysalt"
 	o.length = 40
@@ -127,7 +127,7 @@ func TestPassgenV3_Length(t *testing.T) {
 }
 
 func TestPassgenV3_LongPassword(t *testing.T) {
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "correct horse battery staple"
 	o.salt = "mysalt"
 	o.length = 200
@@ -138,7 +138,7 @@ func TestPassgenV3_LongPassword(t *testing.T) {
 }
 
 func TestPassgenV3_ContainsAllClasses(t *testing.T) {
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "correct horse battery staple"
 	o.salt = "mysalt"
 	o.length = 40
@@ -172,7 +172,7 @@ func TestPassgenV3_ContainsAllClasses(t *testing.T) {
 }
 
 func TestPassgenV3_NoUppers(t *testing.T) {
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "correct horse battery staple"
 	o.salt = "mysalt"
 	o.length = 40
@@ -189,7 +189,7 @@ func TestPassgenV3_NoUppers(t *testing.T) {
 }
 
 func TestPassgenV3_NoNumbers(t *testing.T) {
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "correct horse battery staple"
 	o.salt = "mysalt"
 	o.length = 40
@@ -206,7 +206,7 @@ func TestPassgenV3_NoNumbers(t *testing.T) {
 }
 
 func TestPassgenV3_NoSpecials(t *testing.T) {
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "correct horse battery staple"
 	o.salt = "mysalt"
 	o.length = 40
@@ -225,7 +225,7 @@ func TestPassgenV3_NoSpecials(t *testing.T) {
 func TestPassgenV3_ProportionalDistribution(t *testing.T) {
 	// Generate a long password and verify each class appears roughly equally.
 	// With 4 classes and 400 chars, expect ~100 per class. Allow ±30 tolerance.
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "correct horse battery staple"
 	o.salt = "mysalt"
 	o.length = 400
@@ -258,11 +258,11 @@ func TestPassgenV3_ProportionalDistribution(t *testing.T) {
 }
 
 func TestPassgenV3_DifferentInputsDifferentOutputs(t *testing.T) {
-	o1 := defaultOpts()
+	o1 := testOpts()
 	o1.passphrase = "passphrase1"
 	o1.salt = "salt"
 
-	o2 := defaultOpts()
+	o2 := testOpts()
 	o2.passphrase = "passphrase2"
 	o2.salt = "salt"
 
@@ -272,7 +272,7 @@ func TestPassgenV3_DifferentInputsDifferentOutputs(t *testing.T) {
 }
 
 func TestPassgenV3_GoldenValue(t *testing.T) {
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "correct horse battery staple"
 	o.salt = "mysalt"
 	o.length = 40
@@ -390,7 +390,7 @@ func TestShuffleClasses_Deterministic(t *testing.T) {
 }
 
 func TestBuildEnabledClasses_NoAmbiguous(t *testing.T) {
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "test"
 	o.noAmbiguous = true
 	classes := buildEnabledClasses(o)
@@ -407,7 +407,7 @@ func TestBuildEnabledClasses_NoAmbiguous(t *testing.T) {
 }
 
 func TestBuildEnabledClasses_CustomAmbiguous(t *testing.T) {
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "test"
 	o.noAmbiguous = true
 	o.customAmbiguous = "ABC"
@@ -427,7 +427,7 @@ func TestBuildEnabledClasses_CustomAmbiguous(t *testing.T) {
 }
 
 func TestPassgenV3_NoAmbiguous(t *testing.T) {
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "correct horse battery staple"
 	o.salt = "mysalt"
 	o.length = 200
@@ -444,7 +444,7 @@ func TestPassgenV3_NoAmbiguous(t *testing.T) {
 }
 
 func TestPassgenV3_CycleOrderVaries(t *testing.T) {
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "correct horse battery staple"
 	o.salt = "mysalt"
 	n := len(buildEnabledClasses(o))

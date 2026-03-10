@@ -1,4 +1,4 @@
-package main
+package passgen
 
 import (
 	"strings"
@@ -174,7 +174,7 @@ func TestFilterAmbiguous_LowercaseAlphabet(t *testing.T) {
 }
 
 func TestCreateCharset_NoAmbiguous(t *testing.T) {
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "test"
 	o.noAmbiguous = true
 	charset := createCharset(o)
@@ -186,7 +186,7 @@ func TestCreateCharset_NoAmbiguous(t *testing.T) {
 }
 
 func TestCreateCharset_CustomAmbiguous(t *testing.T) {
-	o := defaultOpts()
+	o := testOpts()
 	o.passphrase = "test"
 	o.noAmbiguous = true
 	o.customAmbiguous = "abc"
