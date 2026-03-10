@@ -60,11 +60,30 @@ func TestBuilder_Generate_InvalidVersion(t *testing.T) {
 	}
 }
 
-// Error: all character classes disabled (v3)
-func TestBuilder_Generate_AllClassesDisabled(t *testing.T) {
-	_, err := passgen.New("phrase").NoUppers().NoNumbers().NoSpecials().Generate()
+// NoUppers+NoNumbers+NoSpecials produces lowercase-only password, no error
+func TestBuilder_Generate_LowercaseOnly(t *testing.T) {
+	pass, err := passgen.New("phrase").NoUppers().NoNumbers().NoSpecials().Generate()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(pass) != 40 {
+		t.Errorf("expected length 40, got %d", len(pass))
+	}
+	for _, c := range pass {
+		if c < 'a' || c > 'z' {
+			t.Errorf("expected lowercase only, got char %q in password %q", c, pass)
+		}
+	}
+}
+
+// Error: all character classes truly empty (all lowercase filtered as ambiguous + all others disabled)
+func TestBuilder_Generate_AllClassesEmpty(t *testing.T) {
+	_, err := passgen.New("phrase").
+		WithAmbiguousChars("abcdefghijklmnopqrstuvwxyz").
+		NoUppers().NoNumbers().NoSpecials().
+		Generate()
 	if err == nil {
-		t.Fatal("expected error when all classes disabled")
+		t.Fatal("expected error when all character classes are empty after filtering")
 	}
 }
 
