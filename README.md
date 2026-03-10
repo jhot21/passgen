@@ -5,7 +5,7 @@ A deterministic password generator: the same passphrase + salt always produces t
 ## Install
 
 ```sh
-go install codeberg.org/jhot/passgen@latest
+go install codeberg.org/jhot/passgen/cmd/passgen@latest
 ```
 
 ## Setup
