@@ -1,4 +1,4 @@
-package main
+package passgen
 
 import (
 	"encoding/binary"
@@ -10,14 +10,14 @@ import (
 	"github.com/aead/skein"
 )
 
-func passgenV1(opts opts) string {
-	encoded := utf16.Encode([]rune(opts.passphrase + opts.salt))
+func passgenV1(o opts) (string, error) {
+	encoded := utf16.Encode([]rune(o.passphrase + o.salt))
 	var hashOut [64]byte
 	skein.Sum512(&hashOut, convertUTF16ToLittleEndianBytes(encoded), nil)
 	hashHex := hex.EncodeToString(hashOut[:])
 
 	start := hexToInt(string(hashHex[0])) + hexToInt(string(hashHex[1])) + hexToInt(string(hashHex[2]))
-	end := start + opts.length
+	end := start + o.length
 
 	encoded91 := base91.EncodeToString([]byte(hashHex))
 
@@ -28,7 +28,7 @@ func passgenV1(opts opts) string {
 		encoded91 = encoded91 + encoded91
 	}
 
-	return encoded91[start:end]
+	return encoded91[start:end], nil
 }
 
 func convertUTF16ToLittleEndianBytes(u []uint16) []byte {

@@ -1,47 +1,47 @@
-package main
+package passgen
 
 import (
 	"crypto/sha256"
+	"fmt"
 
 	"golang.org/x/crypto/chacha20"
 )
 
-func passgenV3(opts opts) string {
-	key := sha256.Sum256([]byte(opts.passphrase + opts.salt))
-	nonce := make([]byte, chacha20.NonceSize) // 12 zero bytes
+func passgenV3(o opts) (string, error) {
+	key := sha256.Sum256([]byte(o.passphrase + o.salt))
+	nonce := make([]byte, chacha20.NonceSize)
 
 	stream, err := chacha20.NewUnauthenticatedCipher(key[:], nonce)
 	if err != nil {
-		// Cannot happen: key is always 32 bytes, nonce always 12 bytes
-		panic(err)
+		return "", fmt.Errorf("passgen: cipher init failed: %w", err)
 	}
 
-	classes := buildEnabledClasses(opts)
+	classes := buildEnabledClasses(o)
 	if len(classes) == 0 {
-		panic("passgen: all character classes are empty after filtering")
+		return "", fmt.Errorf("passgen: all character classes are empty after filtering")
 	}
 	n := len(classes)
-	result := make([]byte, opts.length)
+	result := make([]byte, o.length)
 	cycle := make([]string, n)
 
-	for i := 0; i < opts.length; {
+	for i := 0; i < o.length; {
 		copy(cycle, classes)
 		shuffleClasses(stream, cycle)
-		for j := 0; j < n && i < opts.length; j++ {
+		for j := 0; j < n && i < o.length; j++ {
 			result[i] = sampleFromClass(stream, cycle[j])
 			i++
 		}
 	}
-	return string(result)
+	return string(result), nil
 }
 
-func buildEnabledClasses(opts opts) []string {
+func buildEnabledClasses(o opts) []string {
 	var classes []string
 	ambiguous := ""
-	if opts.noAmbiguous {
+	if o.noAmbiguous {
 		ambiguous = defaultAmbiguous
-		if opts.customAmbiguous != "" {
-			ambiguous = opts.customAmbiguous
+		if o.customAmbiguous != "" {
+			ambiguous = o.customAmbiguous
 		}
 	}
 
@@ -52,7 +52,7 @@ func buildEnabledClasses(opts opts) []string {
 		return filterAmbiguous(class, ambiguous)
 	}
 
-	if !opts.noUppers {
+	if !o.noUppers {
 		if c := maybeFilter("ABCDEFGHIJKLMNOPQRSTUVWXYZ"); c != "" {
 			classes = append(classes, c)
 		}
@@ -60,15 +60,15 @@ func buildEnabledClasses(opts opts) []string {
 	if c := maybeFilter("abcdefghijklmnopqrstuvwxyz"); c != "" {
 		classes = append(classes, c)
 	}
-	if !opts.noNumbers {
+	if !o.noNumbers {
 		if c := maybeFilter("0123456789"); c != "" {
 			classes = append(classes, c)
 		}
 	}
-	if !opts.noSpecials {
+	if !o.noSpecials {
 		specials := defaultSpecials
-		if opts.customSpecials != "" {
-			specials = opts.customSpecials
+		if o.customSpecials != "" {
+			specials = o.customSpecials
 		}
 		if c := maybeFilter(specials); c != "" {
 			classes = append(classes, c)
