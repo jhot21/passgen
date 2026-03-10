@@ -57,7 +57,10 @@ func TestPassgenV2Regression(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := passgenV2(tt.o)
+			got, err := passgenV2(tt.o)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
 			if got != tt.want {
 				t.Errorf("got  %q\nwant %q", got, tt.want)
 			}

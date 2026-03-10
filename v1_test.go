@@ -6,7 +6,10 @@ import (
 )
 
 func TestPassgenV1Regression(t *testing.T) {
-	got := passgenV1(opts{passphrase: "mypassphrase", salt: "testsalt", length: 40})
+	got, err := passgenV1(opts{passphrase: "mypassphrase", salt: "testsalt", length: 40})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	want := "*GS3t`E,*9XR29/Wm7jhw&1:mJB}RI;8YbR{RL.+"
 	if got != want {
 		t.Errorf("passgenV1 = %q, want %q", got, want)
@@ -14,7 +17,10 @@ func TestPassgenV1Regression(t *testing.T) {
 }
 
 func TestPassgenV1EmptySalt(t *testing.T) {
-	got := passgenV1(opts{passphrase: "mypassphrase", salt: "", length: 40})
+	got, err := passgenV1(opts{passphrase: "mypassphrase", salt: "", length: 40})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	want := "1t~IAk<0<1V<9*AS9Oj.xl?Hp!&u_jGS)GX<ll9X"
 	if got != want {
 		t.Errorf("passgenV1 empty salt = %q, want %q", got, want)

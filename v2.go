@@ -2,58 +2,63 @@ package passgen
 
 import (
 	"crypto/sha256"
+	"fmt"
 	"strings"
 
 	"github.com/eknkc/basex"
 )
 
 const defaultSpecials string = "!@#$%^&*"
+
 // I (upper I), l (lower L), 1 (one), O (upper O), 0 (zero), 5, S
 const defaultAmbiguous string = "Il1O05S"
 
-func passgenV2(opts opts) string {
-	charset := createCharset(opts)
-	encoding, _ := basex.NewEncoding(charset)
+func passgenV2(o opts) (string, error) {
+	charset := createCharset(o)
+	encoding, err := basex.NewEncoding(charset)
+	if err != nil {
+		return "", fmt.Errorf("passgen: invalid charset: %w", err)
+	}
 	var out string
 
 	for i := 0; true; i++ {
-		if len(out) >= opts.length { // password is long enough
-			if containsNecessaryCharacters(out[0:opts.length], opts) { // password contains all necessary character classes
+		if len(out) >= o.length { // password is long enough
+			if containsNecessaryCharacters(out[0:o.length], o) { // password contains all necessary character classes
 				break
 			} else { // password is missing character classes, keep second half and keep generating if necessary
 				out = out[int(len(out)/2):]
 			}
 		}
 
-		passphrasePart := strings.Repeat(opts.passphrase, i+1)
-		hash := sha256.Sum256([]byte(passphrasePart + opts.salt))
+		passphrasePart := strings.Repeat(o.passphrase, i+1)
+		hash := sha256.Sum256([]byte(passphrasePart + o.salt))
 		out += encoding.Encode(hash[:])
 	}
 
-	return out[0:opts.length]
+	return out[0:o.length], nil
 }
 
-func createCharset(opts opts) string {
+func createCharset(o opts) string {
 	charset := ""
-	if !opts.noUppers {
+	if !o.noUppers {
 		charset += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	}
 	charset += "abcdefghijklmnopqrstuvwxyz"
-	if !opts.noNumbers {
+	if !o.noNumbers {
 		charset += "0123456789"
 	}
-	if !opts.noSpecials {
-		if opts.customSpecials != "" {
-			charset += opts.customSpecials
+	if !o.noSpecials {
+		if o.customSpecials != "" {
+			charset += o.customSpecials
 		} else {
 			charset += defaultSpecials
 		}
 	}
 
-	if opts.noAmbiguous {
+	if o.noAmbiguous {
 		ambiguous := defaultAmbiguous
-		if opts.customAmbiguous != "" {
-			ambiguous = opts.customAmbiguous
+		if o.customAmbiguous != "" {
+			ambiguous = o.customAmbiguous
 		}
 		charset = filterAmbiguous(charset, ambiguous)
 	}
@@ -72,19 +77,19 @@ func filterAmbiguous(class, ambiguous string) string {
 	return string(result)
 }
 
-func containsNecessaryCharacters(s string, opts opts) bool {
-	if !opts.noNumbers && !strings.ContainsAny(s, "0123456789") {
+func containsNecessaryCharacters(s string, o opts) bool {
+	if !o.noNumbers && !strings.ContainsAny(s, "0123456789") {
 		return false
 	}
 
-	if !opts.noUppers && !strings.ContainsAny(s, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
+	if !o.noUppers && !strings.ContainsAny(s, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
 		return false
 	}
 
-	if !opts.noSpecials {
+	if !o.noSpecials {
 		specials := defaultSpecials
-		if opts.customSpecials != "" {
-			specials = opts.customSpecials
+		if o.customSpecials != "" {
+			specials = o.customSpecials
 		}
 		if !strings.ContainsAny(s, specials) {
 			return false

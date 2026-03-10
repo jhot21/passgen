@@ -105,11 +105,17 @@ func TestPassgenV3_Deterministic(t *testing.T) {
 	o := testOpts()
 	o.passphrase = "correct horse battery staple"
 	o.salt = "mysalt"
-	p1 := passgenV3(o)
+	p1, err := passgenV3(o)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if len(p1) == 0 {
 		t.Fatal("passgenV3 returned empty string")
 	}
-	p2 := passgenV3(o)
+	p2, err := passgenV3(o)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if p1 != p2 {
 		t.Errorf("passgenV3 is not deterministic: %q != %q", p1, p2)
 	}
@@ -120,7 +126,10 @@ func TestPassgenV3_Length(t *testing.T) {
 	o.passphrase = "correct horse battery staple"
 	o.salt = "mysalt"
 	o.length = 40
-	p := passgenV3(o)
+	p, err := passgenV3(o)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if len(p) != 40 {
 		t.Errorf("expected length 40, got %d", len(p))
 	}
@@ -131,7 +140,10 @@ func TestPassgenV3_LongPassword(t *testing.T) {
 	o.passphrase = "correct horse battery staple"
 	o.salt = "mysalt"
 	o.length = 200
-	p := passgenV3(o)
+	p, err := passgenV3(o)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if len(p) != 200 {
 		t.Errorf("expected length 200, got %d", len(p))
 	}
@@ -142,7 +154,10 @@ func TestPassgenV3_ContainsAllClasses(t *testing.T) {
 	o.passphrase = "correct horse battery staple"
 	o.salt = "mysalt"
 	o.length = 40
-	p := passgenV3(o)
+	p, err := passgenV3(o)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	hasUpper, hasLower, hasDigit, hasSpecial := false, false, false, false
 	for _, c := range p {
@@ -177,7 +192,10 @@ func TestPassgenV3_NoUppers(t *testing.T) {
 	o.salt = "mysalt"
 	o.length = 40
 	o.noUppers = true
-	p := passgenV3(o)
+	p, err := passgenV3(o)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if len(p) == 0 {
 		t.Fatal("passgenV3 returned empty string")
 	}
@@ -194,7 +212,10 @@ func TestPassgenV3_NoNumbers(t *testing.T) {
 	o.salt = "mysalt"
 	o.length = 40
 	o.noNumbers = true
-	p := passgenV3(o)
+	p, err := passgenV3(o)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if len(p) == 0 {
 		t.Fatal("passgenV3 returned empty string")
 	}
@@ -211,7 +232,10 @@ func TestPassgenV3_NoSpecials(t *testing.T) {
 	o.salt = "mysalt"
 	o.length = 40
 	o.noSpecials = true
-	p := passgenV3(o)
+	p, err := passgenV3(o)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if len(p) == 0 {
 		t.Fatal("passgenV3 returned empty string")
 	}
@@ -229,7 +253,10 @@ func TestPassgenV3_ProportionalDistribution(t *testing.T) {
 	o.passphrase = "correct horse battery staple"
 	o.salt = "mysalt"
 	o.length = 400
-	p := passgenV3(o)
+	p, err := passgenV3(o)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	counts := map[string]int{"upper": 0, "lower": 0, "digit": 0, "special": 0}
 	for _, c := range p {
@@ -266,7 +293,15 @@ func TestPassgenV3_DifferentInputsDifferentOutputs(t *testing.T) {
 	o2.passphrase = "passphrase2"
 	o2.salt = "salt"
 
-	if passgenV3(o1) == passgenV3(o2) {
+	r1, err := passgenV3(o1)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	r2, err := passgenV3(o2)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if r1 == r2 {
 		t.Error("different passphrases should produce different passwords")
 	}
 }
@@ -276,7 +311,10 @@ func TestPassgenV3_GoldenValue(t *testing.T) {
 	o.passphrase = "correct horse battery staple"
 	o.salt = "mysalt"
 	o.length = 40
-	got := passgenV3(o)
+	got, err := passgenV3(o)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	// Golden value — regenerate with: go run . --salt=mysalt --print "correct horse battery staple"
 	// If this changes, the v3 algorithm has changed and existing passwords will differ.
 	want := "C@c22%Pd#0iO8N$cW$z3Q6p&2o$K1&tB5Nw#^9sP"
@@ -432,7 +470,10 @@ func TestPassgenV3_NoAmbiguous(t *testing.T) {
 	o.salt = "mysalt"
 	o.length = 200
 	o.noAmbiguous = true
-	p := passgenV3(o)
+	p, err := passgenV3(o)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if len(p) == 0 {
 		t.Fatal("passgenV3 returned empty string")
 	}
@@ -450,7 +491,10 @@ func TestPassgenV3_CycleOrderVaries(t *testing.T) {
 	n := len(buildEnabledClasses(o))
 	o.length = 2 * n // exactly two full cycles
 
-	p := passgenV3(o)
+	p, err := passgenV3(o)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if len(p) < 2*n {
 		t.Fatalf("expected password length >= %d, got %d", 2*n, len(p))
 	}
