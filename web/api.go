@@ -2,6 +2,7 @@ package web
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -48,6 +49,10 @@ func handleGenerate(w http.ResponseWriter, r *http.Request) {
 			respondError(w, r, http.StatusBadRequest, "invalid JSON body")
 			return
 		}
+	default:
+		w.Header().Set("Allow", "GET, POST")
+		respondError(w, r, http.StatusMethodNotAllowed, "method not allowed")
+		return
 	}
 
 	if req.Passphrase == "" {
@@ -91,7 +96,9 @@ func handleGenerate(w http.ResponseWriter, r *http.Request) {
 
 	if wantsJSON(r) {
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{"password": pass})
+		if err := json.NewEncoder(w).Encode(map[string]string{"password": pass}); err != nil {
+			log.Printf("handleGenerate: failed to encode JSON: %v", err)
+		}
 		return
 	}
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
@@ -108,14 +115,22 @@ func ParseBool(s string) bool {
 }
 
 func wantsJSON(r *http.Request) bool {
-	return strings.Contains(r.Header.Get("Accept"), "application/json")
+	for _, part := range strings.Split(r.Header.Get("Accept"), ",") {
+		mt := strings.TrimSpace(strings.SplitN(part, ";", 2)[0])
+		if mt == "application/json" {
+			return true
+		}
+	}
+	return false
 }
 
 func respondError(w http.ResponseWriter, r *http.Request, code int, msg string) {
 	if wantsJSON(r) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(code)
-		json.NewEncoder(w).Encode(map[string]string{"error": msg})
+		if err := json.NewEncoder(w).Encode(map[string]string{"error": msg}); err != nil {
+			log.Printf("respondError: failed to encode JSON: %v", err)
+		}
 		return
 	}
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")

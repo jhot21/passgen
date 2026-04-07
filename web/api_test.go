@@ -162,3 +162,31 @@ func TestPOST_PlainTextResponse(t *testing.T) {
 		t.Errorf("want text/plain, got %q", ct)
 	}
 }
+
+func TestMethodNotAllowed(t *testing.T) {
+	req := httptest.NewRequest(http.MethodPut, "/api/generate", nil)
+	w := httptest.NewRecorder()
+	newServer().ServeHTTP(w, req)
+
+	if w.Code != http.StatusMethodNotAllowed {
+		t.Fatalf("want 405, got %d", w.Code)
+	}
+}
+
+func TestGET_CustomSpecials(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/api/generate?passphrase=test&custom_specials=!&length=40", nil)
+	w := httptest.NewRecorder()
+	newServer().ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("want 200, got %d: %s", w.Code, w.Body.String())
+	}
+	body := strings.TrimSpace(w.Body.String())
+	// With custom_specials=! only '!' is allowed as a special char
+	// Verify none of the other default specials appear
+	for _, c := range body {
+		if strings.ContainsRune("@#$%^&*", c) {
+			t.Errorf("password contains %q but custom_specials=! was set", c)
+		}
+	}
+}

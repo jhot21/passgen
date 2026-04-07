@@ -14,8 +14,14 @@ func NewServer() http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	r.Get("/api/generate", handleGenerate)
-	r.Post("/api/generate", handleGenerate)
+	r.Route("/api/generate", func(r chi.Router) {
+		r.Get("/", handleGenerate)
+		r.Post("/", handleGenerate)
+		r.MethodNotAllowed(func(w http.ResponseWriter, req *http.Request) {
+			w.Header().Set("Allow", "GET, POST")
+			respondError(w, req, http.StatusMethodNotAllowed, "method not allowed")
+		})
+	})
 
 	r.Handle("/*", staticHandler())
 
