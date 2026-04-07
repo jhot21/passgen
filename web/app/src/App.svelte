@@ -112,9 +112,7 @@
     {/if}
   </div>
 
-  {#if state === 'generated'}
-    <div class="copied-hint">✓ copied to clipboard</div>
-  {/if}
+  <div class="copied-hint" class:visible={state === 'generated'}>✓ copied to clipboard</div>
 
   {#if errorMsg}
     <div class="error-hint">{errorMsg}</div>
@@ -222,6 +220,8 @@
     gap: 4px;
     padding: 6px 6px 6px 0;
     flex-shrink: 0;
+    min-width: 90px;
+    justify-content: flex-end;
   }
 
   .action-btn {
@@ -250,7 +250,9 @@
     letter-spacing: 0.1em;
     text-transform: uppercase;
     font-weight: 600;
+    visibility: hidden;
   }
+  .copied-hint.visible { visibility: visible; }
 
   .error-hint {
     font-size: 0.72rem;
