@@ -220,8 +220,6 @@
     gap: 4px;
     padding: 6px 6px 6px 0;
     flex-shrink: 0;
-    min-width: 90px;
-    justify-content: flex-end;
   }
 
   .action-btn {
