@@ -138,6 +138,9 @@
 <style>
   :global(*, *::before, *::after) { box-sizing: border-box; margin: 0; padding: 0; }
 
+  /* Svelte mounts into <div id="app"> — make it layout-transparent */
+  :global(#app) { display: contents; }
+
   :global(body) {
     background: #0d0d0d;
     color: #f0f0f0;
@@ -170,8 +173,8 @@
     background: #1a1a1a;
     border: 1px solid #2e2e2e;
     border-radius: 12px;
-    display: grid;
-    grid-template-columns: 1fr 90px;
+    display: flex;
+    align-items: center;
     overflow: hidden;
     height: 56px;
     transition: border-color 0.3s ease;
@@ -179,6 +182,7 @@
   .field.output-mode { border-color: #c8ff0033; }
 
   .field-input {
+    flex: 1;
     background: transparent;
     border: none;
     outline: none;
@@ -192,6 +196,7 @@
   .field-input::placeholder { color: #333; }
 
   .field-display {
+    flex: 1;
     padding: 0 1rem;
     height: 100%;
     display: flex;
@@ -217,8 +222,7 @@
     display: flex;
     gap: 4px;
     padding: 6px 6px 6px 0;
-    align-items: center;
-    justify-content: flex-end;
+    flex-shrink: 0;
   }
 
   .action-btn {
@@ -235,8 +239,7 @@
     flex-shrink: 0;
   }
   .action-btn:hover { background: #d4ff33; }
-  /* btn-go fills the full 90px grid column (84px + 6px right padding) */
-  .btn-go { width: 84px; }
+  .btn-go { width: 44px; }
   .btn-icon { width: 40px; }
 
   /* ── Hints ── */
