@@ -1,5 +1,8 @@
 version: '3'
 
+vars:
+  REPO: codeberg.org/jhot/passgen
+
 tasks:
   wasm:
     desc: Build passgen.wasm and copy wasm_exec.js into app/public/
@@ -32,14 +35,24 @@ tasks:
     desc: Run Go web server locally (run `task build` first)
     cmds:
       - go run ./cmd/passgen-web/
-
+  
   docker:build:
-    desc: Build the Docker image (run from repo root for full context)
-    dir: ..
+    desc: Build and optionally push the multiplatform docker image
     cmds:
-      - docker build -f web/Dockerfile -t passgen-web .
+      - >
+        docker buildx build
+        {{ if (eq .MAIN "true") }}-t {{.REPO}}:main{{ end }}
+        {{ if (ne .VERSION "") }}-t {{.REPO}}:{{.VERSION}}{{ end }}
+        {{ if (eq .LATEST "true") }}-t {{.REPO}}:latest{{ end }}
+        {{ if (eq .PUSH "true") }}--push{{ end }}
+        --platform=linux/amd64,linux/arm64 -f ./Dockerfile ..
+    vars:
+      LATEST: '{{ .LATEST | default "false" }}'
+      MAIN: '{{ .MAIN | default "false" }}'
+      VERSION: '{{ .VERSION | default "" }}'
+      PUSH: '{{ .PUSH | default "true" }}'
 
   docker:run:
     desc: Run the Docker image on port 8080
     cmds:
-      - docker run --rm -p 8080:8080 passgen-web
+      - docker run --rm -p 8080:8080 {{.REPO}}:{{.VERSION | default "dev"}}
