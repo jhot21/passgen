@@ -48,7 +48,7 @@
     </div>
   </div>
 
-  <div class="divider" />
+  <div class="divider"></div>
 
   <!-- Length -->
   <div class="setting-row">
@@ -73,7 +73,7 @@
     </select>
   </div>
 
-  <div class="divider" />
+  <div class="divider"></div>
 
   <!-- No Uppercase -->
   <div class="setting-row">
@@ -84,7 +84,8 @@
       on:click={() => { settings.noUppers = !settings.noUppers; save(); }}
       role="switch"
       aria-checked={settings.noUppers}
-    />
+      aria-label="No uppercase"
+    ></button>
   </div>
 
   <!-- No Numbers -->
@@ -96,7 +97,8 @@
       on:click={() => { settings.noNumbers = !settings.noNumbers; save(); }}
       role="switch"
       aria-checked={settings.noNumbers}
-    />
+      aria-label="No numbers"
+    ></button>
   </div>
 
   <!-- No Specials -->
@@ -108,7 +110,8 @@
       on:click={() => { settings.noSpecials = !settings.noSpecials; save(); }}
       role="switch"
       aria-checked={settings.noSpecials}
-    />
+      aria-label="No specials"
+    ></button>
   </div>
 
   <!-- Custom Specials -->
@@ -126,7 +129,7 @@
     </div>
   </div>
 
-  <div class="divider" />
+  <div class="divider"></div>
 
   <!-- No Ambiguous -->
   <div class="setting-row">
@@ -137,7 +140,8 @@
       on:click={() => { settings.noAmbiguous = !settings.noAmbiguous; save(); }}
       role="switch"
       aria-checked={settings.noAmbiguous}
-    />
+      aria-label="No ambiguous"
+    ></button>
   </div>
 
   <!-- Custom Ambiguous -->
