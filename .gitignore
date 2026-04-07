@@ -1,3 +1,5 @@
 /passgen
 /cmd/passgen/passgen
 docs/
+.superpowers/
+.worktrees/
