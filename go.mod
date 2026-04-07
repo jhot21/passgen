@@ -1,8 +1,6 @@
 module codeberg.org/jhot/passgen
 
-go 1.24.0
-
-toolchain go1.24.3
+go 1.26
 
 require (
 	ekyu.moe/base91 v0.2.3
