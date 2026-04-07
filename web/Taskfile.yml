@@ -1,0 +1,45 @@
+version: '3'
+
+tasks:
+  wasm:
+    desc: Build passgen.wasm and copy wasm_exec.js into app/public/
+    dir: ..
+    cmds:
+      - cd wasm && GOOS=js GOARCH=wasm go build -ldflags="-s -w" -o ../web/app/public/passgen.wasm .
+      - >
+        cp -f "$(go env GOROOT)/misc/wasm/wasm_exec.js" web/app/public/wasm_exec.js 2>/dev/null ||
+        cp -f "$(go env GOROOT)/lib/wasm/wasm_exec.js" web/app/public/wasm_exec.js
+
+  install:
+    desc: Install npm dependencies
+    dir: app
+    cmds:
+      - npm ci
+
+  dev:
+    desc: Start Svelte dev server (run `task wasm` first after any Go library changes)
+    dir: app
+    cmds:
+      - npm run dev
+
+  build:
+    desc: Build Svelte app for production
+    dir: app
+    cmds:
+      - npm run build
+
+  server:
+    desc: Run Go web server locally (run `task build` first)
+    cmds:
+      - go run ./cmd/passgen-web/
+
+  docker:build:
+    desc: Build the Docker image (run from repo root for full context)
+    dir: ..
+    cmds:
+      - docker build -f web/Dockerfile -t passgen-web .
+
+  docker:run:
+    desc: Run the Docker image on port 8080
+    cmds:
+      - docker run --rm -p 8080:8080 passgen-web
