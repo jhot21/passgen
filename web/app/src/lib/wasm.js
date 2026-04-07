@@ -1,18 +1,15 @@
 // Lazy WASM initializer. The Go runtime (window.Go) is loaded by wasm_exec.js
 // via the <script> tag in index.html before this module runs.
 
-let initialized = false;
 let initPromise = null;
 
 async function init() {
-  if (initialized) return;
   const go = new window.Go();
   const result = await WebAssembly.instantiateStreaming(
     fetch('/passgen.wasm'),
     go.importObject,
   );
   go.run(result.instance);
-  initialized = true;
 }
 
 /**
@@ -32,7 +29,10 @@ async function init() {
  */
 export async function generate(opts) {
   if (!initPromise) {
-    initPromise = init();
+    initPromise = init().catch((err) => {
+      initPromise = null; // allow retry on next call
+      throw err;
+    });
   }
   await initPromise;
 
