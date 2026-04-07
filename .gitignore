@@ -8,3 +8,4 @@ web/app/dist/
 web/app/public/passgen.wasm
 web/app/public/wasm_exec.js
 web/passgen-web
+!web/app/dist/placeholder
