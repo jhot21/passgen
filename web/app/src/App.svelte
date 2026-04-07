@@ -170,8 +170,8 @@
     background: #1a1a1a;
     border: 1px solid #2e2e2e;
     border-radius: 12px;
-    display: flex;
-    align-items: center;
+    display: grid;
+    grid-template-columns: 1fr 90px;
     overflow: hidden;
     height: 56px;
     transition: border-color 0.3s ease;
@@ -179,7 +179,6 @@
   .field.output-mode { border-color: #c8ff0033; }
 
   .field-input {
-    flex: 1;
     background: transparent;
     border: none;
     outline: none;
@@ -193,7 +192,6 @@
   .field-input::placeholder { color: #333; }
 
   .field-display {
-    flex: 1;
     padding: 0 1rem;
     height: 100%;
     display: flex;
@@ -219,7 +217,8 @@
     display: flex;
     gap: 4px;
     padding: 6px 6px 6px 0;
-    flex-shrink: 0;
+    align-items: center;
+    justify-content: flex-end;
   }
 
   .action-btn {
@@ -236,7 +235,8 @@
     flex-shrink: 0;
   }
   .action-btn:hover { background: #d4ff33; }
-  .btn-go { width: 44px; }
+  /* btn-go fills the full 90px grid column (84px + 6px right padding) */
+  .btn-go { width: 84px; }
   .btn-icon { width: 40px; }
 
   /* ── Hints ── */
