@@ -10,6 +10,7 @@ export default defineConfig({
       manifest: false, // use our own public/manifest.json
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm}'],
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024, // 4 MiB — passgen.wasm is ~3 MiB
         runtimeCaching: [
           {
             urlPattern: /^\/api\//,
