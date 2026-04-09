@@ -1,0 +1,37 @@
+version: '3'
+
+includes:
+  go:
+    taskfile: https://codeberg.org/jhot/taskfiles/raw/branch/main/go.yaml
+  colima:
+    taskfile: https://codeberg.org/jhot/taskfiles/raw/branch/main/colima.yaml
+  git:
+    taskfile: https://codeberg.org/jhot/taskfiles/raw/branch/main/git.yaml
+  web:
+    taskfile: ./web/Taskfile.yml
+    dir: ./web
+
+tasks:
+  build:cli:
+    cmds:
+      - task: go:build
+        vars:
+          PACKAGES: ./cmd/passgen/
+  build:wasm:
+    desc: Build passgen.wasm and copy wasm_exec.js into app/public/
+    dir: wasm
+    cmds:
+      - GOOS=js GOARCH=wasm go build -ldflags="-s -w" -o ../web/app/public/passgen.wasm .
+      - >
+        cp -f "$(go env GOROOT)/misc/wasm/wasm_exec.js" ../web/app/public/wasm_exec.js 2>/dev/null ||
+        cp -f "$(go env GOROOT)/lib/wasm/wasm_exec.js" ../web/app/public/wasm_exec.js
+  build:
+    cmds:
+      - task: build:cli
+      - task: build:wasm
+  test:
+    cmds:
+      - task: go:test
+        vars:
+          PACKAGES: .
+

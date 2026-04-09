@@ -4,15 +4,6 @@ vars:
   REPO: codeberg.org/jhot/passgen
 
 tasks:
-  wasm:
-    desc: Build passgen.wasm and copy wasm_exec.js into app/public/
-    dir: ..
-    cmds:
-      - cd wasm && GOOS=js GOARCH=wasm go build -ldflags="-s -w" -o ../web/app/public/passgen.wasm .
-      - >
-        cp -f "$(go env GOROOT)/misc/wasm/wasm_exec.js" web/app/public/wasm_exec.js 2>/dev/null ||
-        cp -f "$(go env GOROOT)/lib/wasm/wasm_exec.js" web/app/public/wasm_exec.js
-
   install:
     desc: Install npm dependencies
     dir: app

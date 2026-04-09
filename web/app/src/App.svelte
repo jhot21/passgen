@@ -162,7 +162,7 @@
     font-weight: 900;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: #1e1e1e;
+    color: #454545;
     margin-bottom: 2rem;
     line-height: 1;
     user-select: none;
@@ -171,7 +171,7 @@
   /* ── Field (identical dimensions in both states) ── */
   .field {
     background: #1a1a1a;
-    border: 1px solid #2e2e2e;
+    border: 1px solid #3c3c3c;
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -188,12 +188,12 @@
     outline: none;
     padding: 0 1rem;
     font-size: 0.95rem;
-    color: #888;
+    color: #a0a0a0;
     font-family: inherit;
     height: 100%;
     min-width: 0;
   }
-  .field-input::placeholder { color: #333; }
+  .field-input::placeholder { color: #5a5a5a; }
 
   .field-display {
     flex: 1;
@@ -208,7 +208,7 @@
     min-width: 0;
     letter-spacing: 0.2em;
     font-size: 1rem;
-    color: #2e2e2e;
+    color: #606060;
     transition: color 0.2s ease, letter-spacing 0.2s ease;
   }
   .field-display.revealed {
@@ -277,14 +277,14 @@
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #3a3a3a;
+    color: #606060;
     border: none;
     background: none;
     cursor: pointer;
     padding: 0.25rem 0;
     transition: color 0.15s;
   }
-  .settings-toggle:hover:not(:disabled) { color: #555; }
+  .settings-toggle:hover:not(:disabled) { color: #888; }
   .settings-toggle.open { color: #c8ff00; }
   .settings-toggle:disabled { opacity: 0.2; cursor: default; }
 </style>
