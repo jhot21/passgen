@@ -1,3 +1,12 @@
 /passgen
 /cmd/passgen/passgen
 docs/
+.superpowers/
+.worktrees/
+web/app/node_modules/
+web/app/dist/
+web/app/public/passgen.wasm
+web/app/public/wasm_exec.js
+web/passgen-web
+!web/app/dist/placeholder
+.task/

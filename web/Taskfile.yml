@@ -1,0 +1,49 @@
+version: '3'
+
+vars:
+  REPO: codeberg.org/jhot/passgen
+
+tasks:
+  install:
+    desc: Install npm dependencies
+    dir: app
+    cmds:
+      - npm ci
+
+  dev:
+    desc: Start Svelte dev server (run `task wasm` first after any Go library changes)
+    dir: app
+    cmds:
+      - npm run dev
+
+  build:
+    desc: Build Svelte app for production
+    dir: app
+    cmds:
+      - npm run build
+
+  server:
+    desc: Run Go web server locally (run `task build` first)
+    cmds:
+      - go run ./cmd/passgen-web/
+  
+  docker:build:
+    desc: Build and optionally push the multiplatform docker image
+    cmds:
+      - >
+        docker buildx build
+        {{ if (eq .MAIN "true") }}-t {{.REPO}}:main{{ end }}
+        {{ if (ne .VERSION "") }}-t {{.REPO}}:{{.VERSION}}{{ end }}
+        {{ if (eq .LATEST "true") }}-t {{.REPO}}:latest{{ end }}
+        {{ if (eq .PUSH "true") }}--push{{ end }}
+        --platform=linux/amd64,linux/arm64 -f ./Dockerfile ..
+    vars:
+      LATEST: '{{ .LATEST | default "false" }}'
+      MAIN: '{{ .MAIN | default "false" }}'
+      VERSION: '{{ .VERSION | default "" }}'
+      PUSH: '{{ .PUSH | default "true" }}'
+
+  docker:run:
+    desc: Run the Docker image on port 8080
+    cmds:
+      - docker run --rm -p 8080:8080 {{.REPO}}:{{.VERSION | default "dev"}}
