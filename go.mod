@@ -1,4 +1,4 @@
-module codeberg.org/jhot/passgen
+module github.com/jhot21/passgen
 
 go 1.26
 

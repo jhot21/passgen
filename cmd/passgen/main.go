@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	passgen "codeberg.org/jhot/passgen"
+	passgen "github.com/jhot21/passgen"
 	osc52 "github.com/aymanbagabas/go-osc52/v2"
 	"github.com/peterh/liner"
 	"github.com/teris-io/cli"

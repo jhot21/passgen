@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"codeberg.org/jhot/passgen"
+	"github.com/jhot21/passgen"
 )
 
 // Happy path: basic generation with v3 (default)
