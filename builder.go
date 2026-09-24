@@ -112,6 +112,10 @@ func (b *Builder) NoAmbiguous() *Builder {
 //   - The length is less than 1.
 //   - The version is not 1, 2, or 3.
 //   - All character classes are disabled (leaving no characters to sample from).
+//   - (v2) The character set has fewer than 2 characters.
+//   - (v2) A required character class is filtered away entirely (e.g. by ambiguous-character exclusion).
+//   - (v2) The length is shorter than the number of required character classes.
+//   - (v3) A character class is longer than 256 characters.
 func (b *Builder) Generate() (string, error) {
 	if b.o.passphrase == "" {
 		return "", fmt.Errorf("passgen: passphrase must not be empty")
