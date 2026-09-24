@@ -20,6 +20,11 @@ func passgenV3(o opts) (string, error) {
 	if len(classes) == 0 {
 		return "", fmt.Errorf("passgen: all character classes are empty after filtering")
 	}
+	for _, c := range classes {
+		if len(c) > 256 {
+			return "", fmt.Errorf("passgen: character class longer than 256 characters")
+		}
+	}
 	n := len(classes)
 	result := make([]byte, o.length)
 	cycle := make([]string, n)

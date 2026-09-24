@@ -19,6 +19,9 @@ func passgenV2(o opts) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("passgen: invalid charset: %w", err)
 	}
+	if err := checkV2Satisfiable(o, charset); err != nil {
+		return "", err
+	}
 	var out string
 
 	for i := 0; true; i++ {
@@ -77,24 +80,51 @@ func filterAmbiguous(class, ambiguous string) string {
 	return string(result)
 }
 
-func containsNecessaryCharacters(s string, o opts) bool {
-	if !o.noNumbers && !strings.ContainsAny(s, "0123456789") {
-		return false
+// requiredClassesV2 returns the character classes a v2 password must contain,
+// unfiltered, exactly as containsNecessaryCharacters checks them.
+func requiredClassesV2(o opts) []string {
+	var classes []string
+	if !o.noNumbers {
+		classes = append(classes, "0123456789")
 	}
-
-	if !o.noUppers && !strings.ContainsAny(s, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
-		return false
+	if !o.noUppers {
+		classes = append(classes, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	}
-
 	if !o.noSpecials {
 		specials := defaultSpecials
 		if o.customSpecials != "" {
 			specials = o.customSpecials
 		}
-		if !strings.ContainsAny(s, specials) {
+		classes = append(classes, specials)
+	}
+	return classes
+}
+
+// checkV2Satisfiable returns an error when the passgenV2 loop could never
+// terminate: an alphabet too small to encode with, a required class removed
+// entirely by ambiguous filtering, or a length too short to hold one character
+// from every required class.
+func checkV2Satisfiable(o opts, charset string) error {
+	if len([]rune(charset)) < 2 {
+		return fmt.Errorf("passgen: character set must contain at least 2 characters")
+	}
+	required := requiredClassesV2(o)
+	for _, class := range required {
+		if !strings.ContainsAny(charset, class) {
+			return fmt.Errorf("passgen: a required character class is empty after ambiguous filtering")
+		}
+	}
+	if o.length < len(required) {
+		return fmt.Errorf("passgen: length %d is too short for %d required character classes", o.length, len(required))
+	}
+	return nil
+}
+
+func containsNecessaryCharacters(s string, o opts) bool {
+	for _, class := range requiredClassesV2(o) {
+		if !strings.ContainsAny(s, class) {
 			return false
 		}
 	}
-
 	return true
 }
