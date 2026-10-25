@@ -1,8 +1,8 @@
-module codeberg.org/jhot/passgen/wasm
+module github.com/jhot21/passgen/wasm
 
 go 1.26
 
-require codeberg.org/jhot/passgen v0.0.0
+require github.com/jhot21/passgen v0.0.0
 
 require (
 	ekyu.moe/base91 v0.2.3 // indirect
@@ -12,4 +12,4 @@ require (
 	golang.org/x/sys v0.41.0 // indirect
 )
 
-replace codeberg.org/jhot/passgen => ../
+replace github.com/jhot21/passgen => ../

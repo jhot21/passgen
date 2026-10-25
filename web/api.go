@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	passgen "codeberg.org/jhot/passgen"
+	passgen "github.com/jhot21/passgen"
 )
 
 type generateRequest struct {

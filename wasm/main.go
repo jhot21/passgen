@@ -5,7 +5,7 @@ package main
 import (
 	"syscall/js"
 
-	passgen "codeberg.org/jhot/passgen"
+	passgen "github.com/jhot21/passgen"
 )
 
 func main() {

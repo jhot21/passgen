@@ -1,7 +1,7 @@
 version: '3'
 
 vars:
-  REPO: codeberg.org/jhot/passgen
+  REPO: ghcr.io/jhot21/passgen
 
 tasks:
   install:

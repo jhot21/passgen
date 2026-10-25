@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	web "codeberg.org/jhot/passgen/web"
+	web "github.com/jhot21/passgen/web"
 )
 
 func newServer() http.Handler { return web.NewServer() }

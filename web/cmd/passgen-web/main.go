@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"codeberg.org/jhot/passgen/web"
+	"github.com/jhot21/passgen/web"
 )
 
 func main() {
