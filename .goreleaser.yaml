@@ -37,6 +37,7 @@ brews:
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
     homepage: https://github.com/jhot21/passgen
+    license: MIT
     description: Deterministic password generator from a simple passphrase
     # prereleases (-rc.N etc.) must not update the tap
     skip_upload: auto
