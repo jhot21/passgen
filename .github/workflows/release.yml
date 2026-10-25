@@ -13,7 +13,9 @@ jobs:
         with:
           go-version-file: go.mod
       - run: go test ./...
-      # web embeds app/dist, which only holds a placeholder until the Svelte build runs
+      # web embeds app/dist, which is gitignored; an empty placeholder satisfies the
+      # embed pattern without running the Svelte build
+      - run: mkdir -p web/app/dist && touch web/app/dist/placeholder
       - run: cd web && go test ./...
 
   cli:
