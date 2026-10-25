@@ -5,6 +5,12 @@ A deterministic password generator: the same passphrase + salt always produces t
 ## Install
 
 ```sh
+brew install jhot21/tap/passgen
+```
+
+Or with Go:
+
+```sh
 go install github.com/jhot21/passgen/cmd/passgen@latest
 ```
 

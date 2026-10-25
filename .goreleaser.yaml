@@ -28,3 +28,17 @@ changelog:
 release:
   # any semver prerelease suffix (-alpha.N, -beta.N, -rc.N) is marked as a prerelease
   prerelease: auto
+
+# a formula (not a cask) so brew installs the unsigned darwin binary without a Gatekeeper warning
+brews:
+  - name: passgen
+    repository:
+      owner: jhot21
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    homepage: https://github.com/jhot21/passgen
+    description: Deterministic password generator from a simple passphrase
+    # prereleases (-rc.N etc.) must not update the tap
+    skip_upload: auto
+    test: |
+      assert_match(/\A\S{40}\z/, shell_output("#{bin}/passgen --print --salt=test hello").strip)
