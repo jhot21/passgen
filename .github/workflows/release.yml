@@ -36,6 +36,9 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # several tags can point at one commit (rc.2 then final), and goreleaser
+          # would otherwise pick one of them arbitrarily
+          GORELEASER_CURRENT_TAG: ${{ github.ref_name }}
 
   server:
     needs: test
