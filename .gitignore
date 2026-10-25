@@ -10,3 +10,4 @@ web/app/public/wasm_exec.js
 web/passgen-web
 !web/app/dist/placeholder
 .task/
+/dist/
