@@ -24,3 +24,7 @@ changelog:
       - "^docs:"
       - "^test:"
       - "^chore:"
+
+release:
+  # any semver prerelease suffix (-alpha.N, -beta.N, -rc.N) is marked as a prerelease
+  prerelease: auto
